@@ -8,17 +8,23 @@ if(isset($_POST['envoi'])){
     // verrifier que les camps ne sont pas vide
     if(!empty($_POST['email']) AND !empty($_POST['password'])){
         $email = htmlspecialchars($_POST['email']);
-        $password = sha1($_POST['password']);
-       
-        $requete = $bdd->prepare('SELECT * FROM users WHERE email=? AND password=?');
-        $requete->execute(array($email, $password));
-        $cpt= $requete->rowCount();
-        if($cpt==1){
-            $_SESSION['email'] = $email; // Stocke l'email dans la session
-            $message = "Connexion réussie";
+        $password = htmlspecialchars($_POST['password']);
+
+        $requete = $bdd->prepare('SELECT * FROM users WHERE email=?');
+        $requete->execute(array($email));
+        $user = $requete->fetch(PDO::FETCH_ASSOC);
+
+        if(isset($user)){
+          $is_correct = password_verify($password, $user["password"]);
+          if($is_correct){
+            $message = "Connexion reuissi";
+          }else{
+            $message = "Mot de passe incorrect hash : " . $user["password"]. " password : " .$password . "  password_hash : " . password_hash($password, PASSWORD_BCRYPT);
+          }
         }else{
-            $message = "Aucun compte trouvé";
+            $message = "Aucun compte trouve";
         }
+      
 
     }else{
         $message = "Veuillez remplir tous les champs";

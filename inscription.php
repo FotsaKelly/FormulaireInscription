@@ -7,7 +7,8 @@ if(!empty($_POST['nom']) AND !empty($_POST['prenom']) AND !empty($_POST['email']
     $nom = htmlspecialchars($_POST['nom']);
     $prenom = htmlspecialchars($_POST['prenom']);
     $email = htmlspecialchars($_POST['email']);
-    $password = sha1($_POST['password']);
+    $password = htmlspecialchars($_POST["password"]);
+    $password = password_hash($password, PASSWORD_BCRYPT);
     // operation de controle
         if(strlen($_POST['password'])<7){
             $message = "Votre mot de passe est court";
@@ -22,7 +23,7 @@ if(!empty($_POST['nom']) AND !empty($_POST['prenom']) AND !empty($_POST['email']
                 
                 $inscrire = $bdd->prepare('INSERT INTO users(nom,prenom,email,password) VALUES(?,?,?,?)');
                 $inscrire->execute(array($nom, $prenom, $email, $password));
-                $message = "Inscription réussi";
+                $message = "Inscription réussi ";
            
                 
             }else{
